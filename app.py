@@ -51,7 +51,6 @@ def extract_features(signal, sr):
 
   # Stack MFCCs, delta MFCCs, and delta-delta MFCCs into a single feature vector
   features = np.vstack((mfccs, mel_spectrogram, zcr, rms))
-
   # Return the features
   return features
 
