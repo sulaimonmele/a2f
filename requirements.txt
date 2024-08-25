@@ -1,0 +1,7 @@
+flask
+librosa
+resampy
+nlpaug
+sklearn
+keras
+json
