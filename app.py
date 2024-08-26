@@ -1,11 +1,10 @@
-
+import requests
 from flask import Flask, request, jsonify
 import librosa
 import numpy as np
 import resampy
 from sklearn.preprocessing import LabelEncoder
 from keras.models import load_model
-import requests  # To handle downloading audio from URL
 
 app = Flask(__name__)
 
@@ -14,7 +13,7 @@ model = load_model('best_cnn_model.keras')  # Replace with your model file
 
 # Load the label encoder
 label_encoder = LabelEncoder()
-# Assuming you have a file or code to load the label encoder's classes
+# Load the label encoder classes
 label_encoder.classes_ = np.load('label_encoder_classes.npy', allow_pickle=True)  # Replace with your label encoder classes file
 
 # Function to extract features from audio
@@ -104,9 +103,10 @@ def predict_emotions(audio_file):
 def download_audio_file(url):
     response = requests.get(url)
     if response.status_code == 200:
-        with open('temp_audio_file.wav', 'wb') as file:
+        temp_file_path = 'temp_audio_file.wav'
+        with open(temp_file_path, 'wb') as file:
             file.write(response.content)
-        return 'temp_audio_file.wav'
+        return temp_file_path
     else:
         raise Exception(f"Failed to download the file. Status code: {response.status_code}")
 
@@ -123,11 +123,11 @@ def predict():
         try:
             url = request.json['url']
             audio_file_path = download_audio_file(url)
-            audio_file = open(audio_file_path, 'rb')
+            audio_file = open(audio_file_path, 'rb')  # Open the downloaded file
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
-    if audio_file is None or audio_file.filename == '':
+    if audio_file is None or (hasattr(audio_file, 'filename') and audio_file.filename == ''):
         return jsonify({"error": "No selected file."}), 400
 
     try:
@@ -138,8 +138,8 @@ def predict():
     finally:
         if 'url' in request.json:
             import os
-            os.remove(audio_file.name)  # Clean up the temporary file
+            os.remove(audio_file.name)  # Clean up the temporary file if it was downloaded
 
 # Run the Flask app
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
