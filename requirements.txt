@@ -6,3 +6,4 @@ nlpaug
 sklearn
 keras
 tensorflow
+requests
