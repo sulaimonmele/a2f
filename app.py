@@ -1,3 +1,5 @@
+import tempfile
+import os
 import requests
 from flask import Flask, request, jsonify
 import librosa
@@ -7,6 +9,9 @@ from sklearn.preprocessing import LabelEncoder
 from keras.models import load_model
 
 app = Flask(__name__)
+
+# Global configuration
+CHUNK_DURATION = 4  # Duration of the audio chunk in seconds
 
 # Load the trained model
 model = load_model('best_cnn_model.keras')  # Replace with your model file
@@ -34,7 +39,7 @@ def extract_features(signal, sr):
     rms = librosa.feature.rms(y=signal_resampled)
 
     # Pad or truncate MFCCs to a fixed length
-    max_length = 100  # Set this to a reasonable value based on your dataset
+    max_length = 100
     if mfccs.shape[1] < max_length:
         pad_width = max_length - mfccs.shape[1]
         mfccs = np.pad(mfccs, pad_width=((0, 0), (0, pad_width)), mode='constant')
@@ -47,22 +52,20 @@ def extract_features(signal, sr):
         zcr = zcr[:, :max_length]
         rms = rms[:, :max_length]
 
-    # Stack MFCCs, delta MFCCs, and delta-delta MFCCs into a single feature vector
+    # Stack MFCCs, Mel Spectrogram, ZCR, and RMS into a single feature vector
     features = np.vstack((mfccs, mel_spectrogram, zcr, rms))
-
-    # Return the features
     return features
 
 # Function to predict emotions in audio chunks
 def predict_emotions(audio_file):
     # Load the audio file
-    signal, sr = librosa.load(audio_file)
+    signal, sr = librosa.load(audio_file, sr=None)
 
     # Calculate audio duration
     audio_duration = librosa.get_duration(y=signal, sr=sr)
 
-    # Create chunks of 2 seconds
-    chunk_size = 2 * sr  # 2 seconds in samples
+    # Create chunks of CHUNK_DURATION seconds
+    chunk_size = CHUNK_DURATION * sr  # CHUNK_DURATION seconds in samples
     chunks = []
     for i in range(0, len(signal), chunk_size):
         chunk = signal[i:i + chunk_size]
@@ -82,8 +85,8 @@ def predict_emotions(audio_file):
         emotion = label_encoder.classes_[emotion_index]
         confidence = prediction[0][emotion_index]
         emotions.append({
-            "timestamp": i * 2,  # Timestamp in seconds
-            "duration": 2,  # Duration of each chunk (2 seconds)
+            "timestamp": i * CHUNK_DURATION,  # Timestamp in seconds
+            "duration": CHUNK_DURATION,  # Duration of each chunk (CHUNK_DURATION seconds)
             "emotion": emotion,
             "confidence": round(float(confidence), 2)
         })
@@ -103,10 +106,9 @@ def predict_emotions(audio_file):
 def download_audio_file(url):
     response = requests.get(url)
     if response.status_code == 200:
-        temp_file_path = 'temp_audio_file.wav'
-        with open(temp_file_path, 'wb') as file:
-            file.write(response.content)
-        return temp_file_path
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp_file:
+            tmp_file.write(response.content)
+            return tmp_file.name
     else:
         raise Exception(f"Failed to download the file. Status code: {response.status_code}")
 
@@ -123,7 +125,7 @@ def predict():
         try:
             url = request.json['url']
             audio_file_path = download_audio_file(url)
-            audio_file = open(audio_file_path, 'rb')  # Open the downloaded file
+            audio_file = open(audio_file_path, 'rb')
         except Exception as e:
             return jsonify({"error": str(e)}), 500
 
@@ -137,7 +139,6 @@ def predict():
         return jsonify({"error": str(e)}), 500
     finally:
         if 'url' in request.json:
-            import os
             os.remove(audio_file.name)  # Clean up the temporary file if it was downloaded
 
 # Run the Flask app
