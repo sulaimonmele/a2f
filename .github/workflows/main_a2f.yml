@@ -9,7 +9,8 @@ on:
     branches:
       - main
   workflow_dispatch:
-
+env:
+  SKLEARN_ALLOW_DEPRECATED_SKLEARN_PACKAGE_INSTALL: True
 jobs:
   build:
     runs-on: ubuntu-latest
