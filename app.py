@@ -141,6 +141,10 @@ def predict():
         if 'url' in request.json:
             os.remove(audio_file.name)  # Clean up the temporary file if it was downloaded
 
+#Define the home route
+@app.route("/")
+def hello_world():
+    return "<p>Hello, Welcome To Speech Emotion Detection API!</p>"
 # Run the Flask app
 if __name__ == '__main__':
     app.run()
