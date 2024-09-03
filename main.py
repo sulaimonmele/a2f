@@ -141,6 +141,10 @@ async def redirect_to_docs():
 async def health_check():
     return JSONResponse(content={"status": "ok"}, status_code=200)
 
+@app.get("/git")
+async def redirect_to_github():
+    return RedirectResponse(url="https://github.com/sulaimonmele/a2f")
+
 
 @app.get("/")
 async def root():
