@@ -7,7 +7,7 @@ import resampy
 from sklearn.preprocessing import LabelEncoder
 from keras.models import load_model
 from fastapi import FastAPI, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, RedirectResponse
 from pydantic import BaseModel
 
 app = FastAPI()
@@ -121,6 +121,7 @@ class URLInput(BaseModel):
 @app.post("/predict")
 async def predict(data: URLInput):
     """API endpoint to predict emotions from an audio file provided via URL."""
+    audio_file_path = None  # Initialize here to ensure it exists
     try:
         audio_file_path = download_audio_file(data.url)
         with open(audio_file_path, 'rb') as audio_file:
@@ -132,6 +133,16 @@ async def predict(data: URLInput):
         if audio_file_path:
             os.remove(audio_file_path)
 
+@app.get("/predict")
+async def redirect_to_docs():
+    return RedirectResponse(url="/docs")
+
+@app.get("/healthz")
+async def health_check():
+    return JSONResponse(content={"status": "ok"}, status_code=200)
+
+
 @app.get("/")
 async def root():
-    return {"message": "Hello, Welcome To Speech Emotion Detection API!"}
+    #return {"message": "Hello, Welcome To Speech Emotion Detection API!"}
+    return RedirectResponse(url="/docs")
