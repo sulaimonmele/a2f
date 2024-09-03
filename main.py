@@ -13,7 +13,7 @@ from pydantic import BaseModel
 app = FastAPI()
 
 # Global configuration
-CHUNK_DURATION = 2.5  # Duration of the audio chunk in seconds
+CHUNK_DURATION = 3  # Duration of the audio chunk in seconds
 
 # Load the trained model
 model = load_model('best_cnn_model.keras')  # Replace with your model file
