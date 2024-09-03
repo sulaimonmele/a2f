@@ -1,9 +1,8 @@
-Flask
-Gunicorn
-librosa
-resampy
-nlpaug
-sklearn
-keras
-tensorflow
+fastapi[all]
+uvicorn
 requests
+librosa
+numpy
+resampy
+scikit-learn
+tensorflow
