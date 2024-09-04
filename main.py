@@ -8,9 +8,20 @@ from sklearn.preprocessing import LabelEncoder
 from keras.models import load_model
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
 app = FastAPI()
+
+# Enable CORS for all origins (you can specify a list of domains in place of "*")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins (change this if you want to restrict)
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
+)
+
 
 # Global configuration
 CHUNK_DURATION = 3  # Duration of the audio chunk in seconds
