@@ -89,11 +89,17 @@ curl -X 'POST' \
 
 ## Pre-built Test Audio
 
-The following test audio files can be used for live testing of the API:
+The following (Out Of Sample )test audio files can be used for live testing of the API:
 
 - `https://github.com/sulaimonmele/a2f/raw/main/TestFiles/english_voice_male_p1_anger.wav` (Emotion: Anger)
 - `https://github.com/sulaimonmele/a2f/raw/main/TestFiles/english_voice_male_p1_neutral.wav` (Emotion: Neutral)
 - `https://github.com/sulaimonmele/a2f/raw/main/TestFiles/english_voice_male_p2_amazement.wav` (Emotion: Amazement)
+
+The following (In Sample )test audio files can be used for live testing of the API:
+
+- `https://github.com/sulaimonmele/a2f/raw/main/CremaDTestFiles/1034_ITS_HAP_XX.wav` (Emotion: HAP)
+- `https://github.com/sulaimonmele/a2f/raw/main/CremaDTestFiles/1048_IWL_ANG_XX.wav` (Emotion: ANG)
+- `https://github.com/sulaimonmele/a2f/raw/main/CremaDTestFiles/1049_TAI_NEU_XX.wav` (Emotion: NEU)
 
 More test files are available at the `/test` endpoint.
 
