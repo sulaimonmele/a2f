@@ -6,3 +6,4 @@ numpy
 resampy
 scikit-learn
 tensorflow
+asyncio
