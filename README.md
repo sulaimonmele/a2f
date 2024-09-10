@@ -1,108 +1,106 @@
-
 # Speech Emotion Detection API
 
-This project provides a RESTful API for predicting emotions from audio files. The API uses a pre-trained Convolutional Neural Network (CNN) model to analyze chunks of audio and return the predicted emotion for each chunk. The model processes audio in chunks of 3 seconds and provides the emotion with the highest confidence for each segment.
+This repository contains an API for detecting emotions in audio files using machine learning models. The API extracts features such as Mel Spectrogram, MFCCs, Zero Crossing Rate, and RMS Energy from audio files, and predicts emotions using a pre-trained CNN model.
 
 ## Features
 
-- **Audio Emotion Prediction**: Upload an audio file via URL, and the API returns a prediction of emotions for each 3-second chunk of the audio.
-- **Health Check Endpoint**: Easily check if the API is running.
-- **Documentation**: Automatically generated API documentation.
-
-## Requirements
-
-- Python 3.7 or higher
-- FastAPI
-- Keras
-- TensorFlow
-- librosa
-- resampy
-- scikit-learn
-- numpy
-- requests
-- pydantic
+- **Predict Emotions from Audio**: Detect emotions from audio files provided via a URL.
+- **Sliding Window Emotion Prediction**: Apply sliding windows to audio signals for more fine-grained emotion prediction over time.
+- **Pre-built Test Audio**: Test the API using pre-built audio samples with known emotions.
+- **FastAPI Implementation**: Built with FastAPI for high-performance, asynchronous processing.
+- **CORS Support**: Allow cross-origin requests for flexible use cases.
 
 ## Installation
 
-1. **Clone the repository:**
+1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/speech-emotion-detection-api.git
-   cd speech-emotion-detection-api
+   git clone https://github.com/sulaimonmele/a2f.git
+   cd a2f
    ```
 
-2. **Install the dependencies:**
+2. Install the required dependencies:
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **Download the model and label encoder:**
-   - Place your trained CNN model in the root directory of the project and name it `best_cnn_model.keras`.
-   - Place the `label_encoder_classes.npy` file in the root directory as well.
+3. Download the pre-trained model and label encoder:
+   - Place `best_cnn_model.keras` and `label_encoder_classes.npy` in the root directory.
 
-## Running the API
+## Usage
 
-1. **Start the API:**
+1. Run the API:
    ```bash
    uvicorn main:app --reload
    ```
 
-2. **Access the API documentation:**
-   - Navigate to `http://127.0.0.1:8000/docs` in your web browser to view the automatically generated Swagger documentation.
+2. Access the API documentation at:
+   ```
+   http://127.0.0.1:8000/docs
+   ```
 
-## API Endpoints
+3. Test the `/predict` endpoint by providing a URL to an audio file. The API will return predicted emotions along with their confidence scores.
 
-- **POST /predict**
-  - Predict emotions from an audio file provided via URL.
-  - **Request Body:**
-    ```json
-    {
-      "url": "https://example.com/audiofile.wav"
-    }
-    ```
-  - **Response:**
-    ```json
-    {
-      "status": "success",
-      "message": "Emotions predicted successfully.",
-      "data": {
-        "audioDuration": "12.34 seconds",
-        "emotions": [
-          {
-            "timestamp": 0,
-            "duration": 3,
-            "emotion": "happy",
-            "confidence": 0.85
-          },
-          {
-            "timestamp": 3,
-            "duration": 3,
-            "emotion": "sad",
-            "confidence": 0.92
-          },
-          ...
-        ]
+### Endpoints
+
+- **`POST /predict`**: Predicts emotions from a provided audio file URL.
+  - **Input**: JSON with `url` field containing the audio file URL.
+  - **Output**: JSON with predicted emotions and their confidence scores.
+
+- **`POST /predict/v2`**: Predicts emotions using a sliding window approach for more detailed predictions over time.
+  - **Input**: JSON with `url` field containing the audio file URL.
+  - **Output**: JSON with emotions detected over different timestamps.
+
+- **`GET /test`**: Provides a list of test audio files with known emotions for testing the API.
+
+- **`GET /healthz`**: Health check endpoint to verify the API is running.
+
+- **`GET /`**: Redirects to the API documentation.
+
+- **`GET /git`**: Redirects to the GitHub repository.
+
+## Example Request
+
+```bash
+curl -X 'POST' \
+  'http://127.0.0.1:8000/predict' \
+  -H 'Content-Type: application/json' \
+  -d '{"url":"https://github.com/sulaimonmele/a2f/raw/main/TestFiles/english_voice_male_p1_anger.wav"}'
+```
+
+### Example Response
+
+```json
+{
+  "status": "success",
+  "message": "Emotions predicted successfully.",
+  "data": {
+    "audioDuration": "3.0 seconds",
+    "emotions": [
+      {
+        "timestamp": 0,
+        "duration": 3,
+        "emotion": "anger",
+        "confidence": 0.92
       }
-    }
-    ```
+    ]
+  }
+}
+```
 
-- **GET /healthz**
-  - Check the health status of the API.
-  - **Response:**
-    ```json
-    {
-      "status": "ok"
-    }
-    ```
+## Pre-built Test Audio
 
-- **GET /**
-  - Redirect to the API documentation.
+The following test audio files can be used for live testing of the API:
 
-## Project Structure
+- `https://github.com/sulaimonmele/a2f/raw/main/TestFiles/english_voice_male_p1_anger.wav` (Emotion: Anger)
+- `https://github.com/sulaimonmele/a2f/raw/main/TestFiles/english_voice_male_p1_neutral.wav` (Emotion: Neutral)
+- `https://github.com/sulaimonmele/a2f/raw/main/TestFiles/english_voice_male_p2_amazement.wav` (Emotion: Amazement)
 
-- `main.py`: Contains the API logic.
-- `best_cnn_model.keras`: The pre-trained CNN model.
-- `label_encoder_classes.npy`: Numpy file containing the label encoder classes.
+More test files are available at the `/test` endpoint.
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
+
+---
+
+Feel free to contribute by submitting pull requests or issues on the [GitHub repository](https://github.com/sulaimonmele/a2f).
