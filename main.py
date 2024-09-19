@@ -237,6 +237,10 @@ async def health_check():
 async def redirect_to_github():
     return RedirectResponse(url="https://github.com/sulaimonmele/a2f")
 
+@app.get("/unitydemo")
+async def redirect_to_github():
+    return RedirectResponse(url="https://play.unity.com/en/user/3221ee49-c016-4f4d-8b5c-da38b7c911a7")
+
 
 @app.get("/")
 async def root():
